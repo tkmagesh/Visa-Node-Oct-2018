@@ -8,25 +8,29 @@ function isStatic(pathString){
 	return staticExtns.indexOf(extn) >= 0;
 }
 
-module.exports = function(req, res){
+module.exports = function(req, res, next){
 	if (isStatic(req.urlObj.pathname)){
 		var resourceFullName = path.join(__dirname, req.urlObj.pathname);
 		if (!fs.existsSync(resourceFullName)){
 			console.log('[@serveStatic] resource not found - serving 404');
 			res.statusCode = 404;
 			res.end();
+			next();
 			return;
 		}
-		/*var stream = fs.createReadStream(resourceFullName);
+		var stream = fs.createReadStream(resourceFullName);
 		//stream.pipe(res);
 		stream.on('data', function(chunk){
 			res.write(chunk);
 		});
 		stream.on('end', function(){
 			res.end();
-		});*/
-		var fileContents = fs.readFileSync(resourceFullName);
+			next();
+		});
+		/*var fileContents = fs.readFileSync(resourceFullName);
 		res.write(fileContents);
-		res.end();
-	} 
+		res.end();*/
+	} else {
+		next();
+	}
 };
