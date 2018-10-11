@@ -1,23 +1,18 @@
 var express = require('express');
 var router = express.Router();
 
-var taskList = [
-	{id : 1, name : 'Learn JavaScript', isCompleted : false},
-	{id : 2, name : 'Explore Bangalore', isCompleted : true}
-];
+var taskService = require('../services/taskService');
 
 router.get('/', function(req, res, next){
-	res.json(taskList);
+	res.json(taskService.getAll());
 });
 
 router.get('/:id', function(req, res, next){
 	var taskId = parseInt(req.params.id);
-	var task = taskList.find(function(task){
-		return task.id === taskId;
-	});
-	if (task){
+	try{
+		var task = taskService.get(taskId);
 		res.json(task);
-	} else {
+	} catch (err) {
 		res.sendStatus(404);
 	}
 });
