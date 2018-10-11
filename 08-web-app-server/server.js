@@ -1,11 +1,32 @@
 var http = require('http'),
+	fs = require('fs'),
+	path = require('path'),
 	url = require('url'),
 	querystring = require('querystring'),
 	calculator = require('./calculator');
 
-var server = http.createServer(function(req, res){
+
+var staticExtns = ['.html', '.js', '.css', '.jpg', '.png', '.ico', '.xml', '.json'];
+
+function isStatic(pathString){
+	var extn = path.extname(pathString);
+	return staticExtns.indexOf(extn) >= 0;
+}
+
+var server = http.createServer(function(req /*Readable Stream*/, res /* Writable Stream*/){
+	console.log(req.method + '\t' + req.url);
 	var urlObj = url.parse(req.url);
-	if (urlObj.pathname === '/calculator' && req.method === 'GET'){
+	//static resource
+	if (isStatic(urlObj.pathname)){
+		var resourceFullName = path.join(__dirname, urlObj.pathname);
+		if (!fs.existsSync(resourceFullName)){
+			res.statusCode = 404;
+			res.end();
+			return;
+		}
+		var stream = fs.createReadStream(resourceFullName);
+		stream.pipe(res);
+	} else if (urlObj.pathname === '/calculator' && req.method === 'GET'){
 		var queryData = querystring.parse(urlObj.query),
 			op = queryData.op,
 			n1 = parseInt(queryData.n1),
@@ -33,5 +54,6 @@ var server = http.createServer(function(req, res){
 	}
 });
 
-server.listen(8085);
-console.log('app server listening on 8085...');
+server.listen(8080);
+
+console.log('server listening on 8080..');
