@@ -9,27 +9,18 @@ function isStatic(pathString){
 }
 
 module.exports = function(req, res, next){
-	if (isStatic(req.urlObj.pathname)){
-		var resourceFullName = path.join(__dirname, req.urlObj.pathname);
+	var resourceName = req.urlObj.pathname === '/' ? 'index.html' : req.urlObj.pathname;
+	if (isStatic(resourceName)){
+		var resourceFullName = path.join(__dirname, resourceName);
 		if (!fs.existsSync(resourceFullName)){
-			console.log('[@serveStatic] resource not found - serving 404');
-			res.statusCode = 404;
-			res.end();
 			next();
 			return;
 		}
 		var stream = fs.createReadStream(resourceFullName);
-		//stream.pipe(res);
-		stream.on('data', function(chunk){
-			res.write(chunk);
-		});
+		stream.pipe(res);		
 		stream.on('end', function(){
-			res.end();
 			next();
 		});
-		/*var fileContents = fs.readFileSync(resourceFullName);
-		res.write(fileContents);
-		res.end();*/
 	} else {
 		next();
 	}
