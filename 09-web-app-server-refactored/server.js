@@ -7,7 +7,7 @@ var dataParser = require('./dataParser'),
 	app = require('./app');
 
 app.use(dataParser);
-app.use(serveStatic);
+app.use(serveStatic(path.join(__dirname, 'public')));
 app.use(serveCalculator);
 app.use(notFoundHandler);
 
