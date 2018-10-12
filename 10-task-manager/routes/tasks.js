@@ -15,18 +15,25 @@ router.get('/', function(req, res, next){
 
 router.get('/:id', function(req, res, next){
 	var taskId = parseInt(req.params.id);
-	try{
-		var task = taskService.get(taskId);
-		res.json(task);
-	} catch (err) {
-		res.sendStatus(404);
-	}
+	taskService.get(taskId, function(err, task){
+		if (err){
+			res.sendStatus(404);		
+		} else {
+			res.json(task);				
+		}
+	});
+
 });
 
 router.post('/', function(req, res, next){
 	var newTask = req.body;
-	taskService.addNew(newTask);
-	res.status(201).json(newTask);
+	taskService.addNew(newTask, function(err, task){
+		if (err){
+			res.sendStatus(500);
+			return;
+		}
+		res.status(201).json(task);
+	});
 });
 
 router.put('/:id', function(req, res, next){

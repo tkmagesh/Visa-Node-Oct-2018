@@ -5,24 +5,38 @@ var taskService = {
 		taskDb.getData(callback);
 	},
 	get(taskId){
-		var taskList = taskDb.getData();
-		var task = taskList.find(function(task){
-			return task.id === taskId;
+		taskDb.getData(function(err, taskList){
+			var task = taskList.find(function(task){
+				return task.id === taskId;
+			});
+			if (task){
+				callback(null, task);
+			} else {
+				callback( new Error('Task Not Found'));
+			}
 		});
-		if (task){
-			return task;
-		} else {
-			throw new Error('Task Not Found');
-		}
+		
 	},
-	addNew(taskData){
-		var taskList = taskDb.getData();
-		taskData.id = taskList.reduce(function(result, task){
-			return result > task.id ? result : task.id;
-		}, 0) + 1;
-		taskList.push(taskData);
-		taskDb.saveData(taskList);
-		return taskData;
+	addNew(taskData, callback){
+		taskDb.getData(function(err, taskList){
+			if (err){
+				callback(err);
+				return;
+			}
+			taskData.id = taskList.reduce(function(result, task){
+				return result > task.id ? result : task.id;
+			}, 0) + 1;
+			taskList.push(taskData);
+			taskDb.saveData(taskList, function(err){
+				if (err){
+					callback(err);
+					return;
+				}
+				callback(null, taskData);
+			});
+			
+		});
+		
 	},
 	update(taskIdToUpdate, updatedTask){
 		var existingTask = taskList.find(function(task){

@@ -15,8 +15,8 @@ module.exports = {
 		});
 		
 	},
-	saveData(taskList){
+	saveData(taskList,callback){
 		var rawData = JSON.stringify(taskList);
-		return fs.writeFileSync(dbFile, rawData);
+		fs.writeFile(dbFile, rawData, callback);
 	}
 }
