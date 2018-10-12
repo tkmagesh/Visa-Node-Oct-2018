@@ -5,9 +5,15 @@ var fs = require('fs'),
 var dbFile = path.join(__dirname, 'tasks.json');
 
 module.exports = {
-	getData(){
-		var rawData = fs.readFileSync(dbFile, 'utf8');
-		return JSON.parse(rawData);
+	getData(callback){
+		fs.readFile(dbFile, 'utf8', function(err, rawData){
+			if (err){
+				callback(err);
+			} else {
+				callback(null, JSON.parse(rawData));
+			}
+		});
+		
 	},
 	saveData(taskList){
 		var rawData = JSON.stringify(taskList);

@@ -4,7 +4,13 @@ var router = express.Router();
 var taskService = require('../services/taskService');
 
 router.get('/', function(req, res, next){
-	res.json(taskService.getAll());
+	taskService.getAll(function(err, taskList){
+		if (err){
+			res.sendStatus(500);
+		} else {
+			res.json(taskList);		
+		}
+	});
 });
 
 router.get('/:id', function(req, res, next){

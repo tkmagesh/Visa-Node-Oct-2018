@@ -1,8 +1,8 @@
 var taskDb = require('../data/taskDb');
 
 var taskService = {
-	getAll(){
-		return taskDb.getData();
+	getAll(callback){
+		taskDb.getData(callback);
 	},
 	get(taskId){
 		var taskList = taskDb.getData();
