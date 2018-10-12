@@ -19,43 +19,30 @@ router.get('/:id', function(req, res, next){
 
 router.post('/', function(req, res, next){
 	var newTask = req.body;
-	newTask.id = taskList.reduce(function(result, task){
-		return result > task.id ? result : task.id;
-	}, 0) + 1;
-	taskList.push(newTask);
+	taskService.addNew(newTask);
 	res.status(201).json(newTask);
 });
 
 router.put('/:id', function(req, res, next){
 	var updatedTask = req.body,
 		taskIdToUpdate = parseInt(req.params.id);
-	var existingTask = taskList.find(function(task){
-		return task.id === taskIdToUpdate;
-	});
-	if (existingTask){
-		taskList = taskList.map(function(task){
-			return task.id === taskIdToUpdate ? updatedTask : task;
-		});
+	try{
+		taskService.update(taskIdToUpdate, updatedTask);
 		res.status(200).json(updatedTask);
-	} else {
+	} catch(err) {
 		res.sendStatus(404);
 	}
-})
+});
 
 router.delete('/:id', function(req, res, next){
 	var taskIdToDelete = parseInt(req.params.id);
-	var existingTask = taskList.find(function(task){
-		return task.id === taskIdToDelete;
-	});
-	if (existingTask){
-		taskList = taskList.filter(function(task){
-			return task.id !== taskIdToDelete;
-		});
+	try{
+		taskService.remove(taskIdToDelete);
 		res.sendStatus(200);
-	} else {
+	} catch(err) {
 		res.sendStatus(404);
 	}
-})
+});
 
 
 module.exports = router;
