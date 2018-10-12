@@ -36,29 +36,45 @@ var taskService = {
 			});
 	},
 	update(taskIdToUpdate, updatedTask){
-		var existingTask = taskList.find(function(task){
-			return task.id === taskIdToUpdate;
-		});
-		if (existingTask){
-			taskList = taskList.map(function(task){
-				return task.id === taskIdToUpdate ? updatedTask : task;
+		return taskDb
+			.getData()
+			.then(function(taskList){
+				var existingTask = taskList.find(function(task){
+					return task.id === taskIdToUpdate;
+				});	
+				if (existingTask){
+					taskList = taskList.map(function(task){
+						return task.id === taskIdToUpdate ? updatedTask : task;
+					});
+					return taskDb
+						.saveData(taskList)
+						.then(function(){
+							return updatedTask;		
+						});
+				} else {
+					throw new Error('Task Not Found');
+				}	
 			});
-			return updatedTask;
-		} else {
-			throw new Error('Task Not Found');
-		}
+		
+		
 	},
 	remove(taskIdToDelete){
-		var existingTask = taskList.find(function(task){
-			return task.id === taskIdToDelete;
-		});
-		if (existingTask){
-			taskList = taskList.filter(function(task){
-				return task.id !== taskIdToDelete;
+		return taskDb
+			.getData()
+			.then(function(taskList){
+				var existingTask = taskList.find(function(task){
+					return task.id === taskIdToDelete;
+				});	
+				if (existingTask){
+					taskList = taskList.filter(function(task){
+						return task.id !== taskIdToDelete;
+					});
+					return taskDb.saveData(taskList);
+				} else {
+					throw new Error('Task Not Found');
+				}	
 			});
-		} else {
-			throw new Error('Task Not Found');
-		}
+		
 	}
 
 };

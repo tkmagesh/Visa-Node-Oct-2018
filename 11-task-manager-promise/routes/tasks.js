@@ -41,22 +41,27 @@ router.post('/', function(req, res, next){
 router.put('/:id', function(req, res, next){
 	var updatedTask = req.body,
 		taskIdToUpdate = parseInt(req.params.id);
-	try{
-		taskService.update(taskIdToUpdate, updatedTask);
-		res.status(200).json(updatedTask);
-	} catch(err) {
-		res.sendStatus(404);
-	}
+	taskService
+		.update(taskIdToUpdate, updatedTask)
+		.then(function(updatedTask){
+			res.status(200).json(updatedTask);
+		})
+		.catch(function(err){
+			res.sendStatus(404);	
+		});
+	
 });
 
 router.delete('/:id', function(req, res, next){
 	var taskIdToDelete = parseInt(req.params.id);
-	try{
-		taskService.remove(taskIdToDelete);
-		res.sendStatus(200);
-	} catch(err) {
-		res.sendStatus(404);
-	}
+	taskService
+		.remove(taskIdToDelete)
+		.then(function(){
+			res.sendStatus(200);	
+		})
+		.catch(function(err){
+			res.sendStatus(404);	
+		});
 });
 
 
