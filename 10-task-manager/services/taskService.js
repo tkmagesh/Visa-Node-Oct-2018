@@ -1,13 +1,11 @@
-var taskList = [
-	{id : 1, name : 'Learn JavaScript', isCompleted : false},
-	{id : 2, name : 'Explore Bangalore', isCompleted : true}
-];
+var taskDb = require('../data/taskDb');
 
 var taskService = {
 	getAll(){
-		return taskList;
+		return taskDb.getData();
 	},
 	get(taskId){
+		var taskList = taskDb.getData();
 		var task = taskList.find(function(task){
 			return task.id === taskId;
 		});
@@ -18,10 +16,12 @@ var taskService = {
 		}
 	},
 	addNew(taskData){
+		var taskList = taskDb.getData();
 		taskData.id = taskList.reduce(function(result, task){
 			return result > task.id ? result : task.id;
 		}, 0) + 1;
 		taskList.push(taskData);
+		taskDb.saveData(taskList);
 		return taskData;
 	},
 	update(taskIdToUpdate, updatedTask){
