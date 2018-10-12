@@ -1,16 +1,14 @@
-var taskDb = require('../data/taskDb');
+const taskDb = require('../data/taskDb');
 
-var taskService = {
+const taskService = {
 	getAll(){
 		return taskDb.getData();
 	},
 	get(taskId){
 		return taskDb
 			.getData()
-			.then(function(taskList){
-				var task = taskList.find(function(task){
-					return task.id === taskId;
-				});
+			.then(taskList => {
+				var task = taskList.find( task => task.id === taskId);
 				if (task){
 					return task;
 				} else {
@@ -18,45 +16,34 @@ var taskService = {
 				}
 			});		
 	},
-	addNew(taskData){
+	/*addNew(taskData){
 		return taskDb
 			.getData()
-			.then(function(taskList){
-				taskData.id = taskList.reduce(function(result, task){
-					return result > task.id ? result : task.id;
-				}, 0) + 1;
+			.then(taskList => {
+				taskData.id = taskList.reduce((result, task) => result > task.id ? result : task.id, 0) + 1;
 				taskList.push(taskData);
 				return taskList;
 			})
-			.then(function(taskList){
-				return taskDb.saveData(taskList)
-			})
-			.then(function(){
-				return taskData;
-			});
+			.then( taskList => taskDb.saveData(taskList))
+			.then(_ => taskData);
+	},*/
+	async addNew(taskData){
+		let taskList = await taskDb.getData();
+		taskData.id = taskList.reduce((result, task) => result > task.id ? result : task.id, 0) + 1;
+		taskList.push(taskData);
+		await taskDb.saveData(taskList)
+		return taskData;
 	},
-	update(taskIdToUpdate, updatedTask){
-		return taskDb
-			.getData()
-			.then(function(taskList){
-				var existingTask = taskList.find(function(task){
-					return task.id === taskIdToUpdate;
-				});	
-				if (existingTask){
-					taskList = taskList.map(function(task){
-						return task.id === taskIdToUpdate ? updatedTask : task;
-					});
-					return taskDb
-						.saveData(taskList)
-						.then(function(){
-							return updatedTask;		
-						});
-				} else {
-					throw new Error('Task Not Found');
-				}	
-			});
-		
-		
+	async update(taskIdToUpdate, updatedTask){
+		let taskList = await taskDb.getData();
+		let existingTask = taskList.find( task => task.id === taskIdToUpdate);
+		if (existingTask){
+			taskList = taskList.map(task => task.id === taskIdToUpdate ? updatedTask : task);
+			await taskDb.saveData(taskList);
+			return updatedTask;		
+		} else {
+			throw new Error('Task Not Found');
+		}	
 	},
 	remove(taskIdToDelete){
 		return taskDb

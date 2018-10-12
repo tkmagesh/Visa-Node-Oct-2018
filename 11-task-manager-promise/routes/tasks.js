@@ -3,15 +3,21 @@ var router = express.Router();
 
 var taskService = require('../services/taskService');
 
-router.get('/', function(req, res, next){
-	taskService
+router.get('/', async function(req, res, next){
+	/*taskService
 		.getAll()
 		.then(function(taskList){
 			res.json(taskList);
 		})
 		.catch(function(err){
 			res.sendStatus(500);
-		})
+		})*/
+	try {
+		let taskList = await taskService.getAll();
+		res.json(taskList);
+	} catch (err){
+		res.sendStatus(500);
+	}
 });
 
 router.get('/:id', function(req, res, next){
